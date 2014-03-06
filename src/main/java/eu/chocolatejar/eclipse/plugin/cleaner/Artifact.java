@@ -115,7 +115,7 @@ public class Artifact implements Comparable<Artifact> {
 		Manifest bundleManifest = readManifestfromJarOrDirectory(manifest);
 
 		if (bundleManifest == null) {
-			logger.debug("The invalid manifest {}", manifest);
+			logger.debug("Invalid manifest '{}'", manifest);
 		}
 		Attributes attributes = bundleManifest.getMainAttributes();
 		String bundleSymbolicName = getRequiredHeader(attributes, Constants.BUNDLE_SYMBOLICNAME);

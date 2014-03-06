@@ -84,9 +84,11 @@ public class Cleaner {
 	}
 
 	public void doCleanUp() {
+		logger.info("\n Parameters summary\n\n Eclipse source folder: '{}'\n Move duplicates to: '{}'\n Dry run: '{}'\n\n",sourceFolder,destinationFolder, doRealCleanUp?"No":"Yes");
+
 		if (!sourceFolder.exists()) {
 			logger.error(
-					"The Eclipse installation hasn't found at '{}', the location doesn't exists. \n\n The program terminated with an error!",
+					"The Eclipse installation hasn't been found at '{}', the location doesn't exists. \n\n The program terminated with an error!",
 					sourceFolder);
 			return;
 		}
@@ -95,7 +97,7 @@ public class Cleaner {
 			logger.warn("The destination folder '{}' already exists! The duplicates will be move to this folder.",
 					destinationFolder);
 		}
-
+		
 		doCleanUpFor("plugins");
 		doCleanUpFor("features");
 
@@ -108,7 +110,7 @@ public class Cleaner {
 	private void doCleanUpFor(String type) {
 		File destinationTypeFolder = FileUtils.getFile(destinationFolder, type);
 
-		logger.info("Scanning Eclipse for {} at '{}'\n", type, sourceFolder);
+		logger.info("Scanning your Eclipse installation for {} at '{}'\n", type, destinationTypeFolder);
 		Set<Artifact> artifacts = find(type);
 		if (artifacts.isEmpty()) {
 			logger.error("No {} found!", type);
