@@ -1,0 +1,300 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>eu.chocolatejar.eclipse</groupId>
+	<artifactId>plugin-cleaner</artifactId>
+	<version>0.1.0</version>
+	<name>Eclipse Plugin Cleaner</name>
+	<description>Removes duplicatated plugins &amp; features from your Eclipse installation</description>
+	<url>https://github.com/azachar/eclipse-plugin-cleaner</url>
+	<scm>
+		<url>https://github.com/azachar/eclipse-plugin-cleaner</url>
+		<connection>scm:git:git://github.com/azachar/eclipse-plugin-cleaner.git</connection>
+		<developerConnection>scm:git:git@github.com:azachar/eclipse-plugin-cleaner.git</developerConnection>
+	  <tag>v0.1.0</tag>
+  </scm>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>azachar</id>
+			<name>Andrej Zachar</name>
+			<email>andrej@chocolatejar.eu</email>
+			<url>https://github.com/azachar</url>
+		</developer>
+	</developers>
+	<issueManagement>
+		<url>https://github.com/azachar/eclipse-plugin-cleaner/issues</url>
+		<system>GitHub</system>
+	</issueManagement>
+	<ciManagement>
+		<system>travis</system>
+		<url>https://travis-ci.org/azachar/eclipse-plugin-cleaner</url>
+	</ciManagement>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<built.repo.dir>${project.build.directory}/repo</built.repo.dir>
+		<!-- github server corresponds to entry in ~/.m2/settings.xml -->
+		<github.global.server>github</github.global.server>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.3.0</version>
+		</dependency>
+
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>1.5.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>eu.chocolatejar.eclipse.plugin.cleaner.Main</mainClass>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!-- Inspired from https://github.com/vorburger/mvnDeployGitHubTravisCI/blob/master/pom.xml -->
+		<profile>
+			<id>release</id>
+			<distributionManagement>
+				<repository>
+					<id>internal.repo</id>
+					<name>Temporary Staging Repository</name>
+					<url>file://${project.build.directory}/mvn-repo</url>
+				</repository>
+			</distributionManagement>
+
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<version>2.8.1</version>
+						<configuration>
+							<altDeploymentRepository>internal.repo::default::file://${built.repo.dir}</altDeploymentRepository>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>com.github.github</groupId>
+						<artifactId>site-maven-plugin</artifactId>
+						<version>0.8</version>
+						<configuration>
+							<!-- git commit message -->
+							<message>Maven artifacts for
+								${project.groupId}:${project.artifactId}:${project.version}
+								~${maven.build.timestamp}</message>
+							<noJekyll>true</noJekyll>                                                                           <!-- disable webpage processing -->
+							<outputDirectory>${built.repo.dir}</outputDirectory>
+							<!-- This isn't perfect, because every old SNAPSHOT is kept.. -->
+							<merge>true</merge>
+
+							<!-- <dryRun>true</dryRun> -->
+							<branch>refs/heads/gh-pages</branch>                  <!-- remote branch name -->
+							<path>maven/snapshots</path>
+
+							<!-- This token, obtained from https://github.com/settings/applications, 
+								encrypted using http://about.travis-ci.org/docs/user/build-configuration/#Secure-environment-variables, 
+								is like a password; encrypt & guard it carefully! -->
+							<oauth2Token>${env.TOKEN}</oauth2Token>
+
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</configuration>
+						<executions>
+							<!-- run site-maven-plugin's 'site' target as part of the build's 
+								normal 'deploy' phase -->
+							<execution>
+								<goals>
+									<goal>site</goal>
+								</goals>
+								<phase>deploy</phase>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<version>2.4.2</version>
+						<configuration>
+							<tagNameFormat>v@{project.version}</tagNameFormat>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>site</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.github</groupId>
+						<artifactId>downloads-maven-plugin</artifactId>
+						<version>0.6</version>
+						<configuration>
+							<description>Official ${project.name} build of the
+								${project.version} release</description>
+							<override>true</override>
+							<includeAttached>true</includeAttached>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<phase>deploy</phase>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.github</groupId>
+						<artifactId>site-maven-plugin</artifactId>
+						<version>0.9</version>
+						<configuration>
+							<message>Building site for ${project.version}</message>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<goal>site</goal>
+								</goals>
+								<phase>site</phase>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-site-plugin</artifactId>
+						<version>3.3</version>
+						<configuration>
+							<reportPlugins>
+								<plugin>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-project-info-reports-plugin</artifactId>
+									<version>2.2</version>
+									<configuration>
+										<dependencyDetailsEnabled>true</dependencyDetailsEnabled>
+										<dependencyLocationsEnabled>true</dependencyLocationsEnabled>
+									</configuration>
+								</plugin>
+								<plugin>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-javadoc-plugin</artifactId>
+									<version>2.9.1</version>
+								</plugin>
+								<plugin>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-surefire-report-plugin</artifactId>
+									<version>2.16</version>
+								</plugin>
+								<plugin>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-checkstyle-plugin</artifactId>
+									<version>2.11</version>
+								</plugin>
+							</reportPlugins>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
