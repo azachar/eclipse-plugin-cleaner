@@ -4,7 +4,7 @@
 	<artifactId>plugin-cleaner</artifactId>
 	<version>0.1.1-SNAPSHOT</version>
 	<name>Eclipse Plugin Cleaner</name>
-	<description>Removes duplicatated plugins &amp; features from your Eclipse installation</description>
+	<description>Removes duplicated plugins &amp; features from your Eclipse installation</description>
 	<url>https://github.com/azachar/eclipse-plugin-cleaner</url>
 	<scm>
 		<url>https://github.com/azachar/eclipse-plugin-cleaner</url>
@@ -75,6 +75,12 @@
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<version>1.5.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -1,7 +1,21 @@
+/*******************************************************************************
+ * Copyright 2014 Chocolate Jar, Andrej Zachar
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *******************************************************************************/
 package eu.chocolatejar.eclipse.plugin.cleaner;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Finds bundles and move duplicates to a different folder
+ * Finds duplicate bundles and move them to a back up folder
  */
 public class Cleaner {
 	private static final Logger logger = LoggerFactory.getLogger(Cleaner.class);
@@ -25,9 +39,9 @@ public class Cleaner {
 
 	/**
 	 * @param sourceFolder
-	 *            The base directory to scan for files.
+	 *            The base directory to scan for Eclipse Installation.
 	 * @param destinationFolder
-	 *            The destination deployment package file.
+	 *            The destination folder for moving duplicates
 	 * @param dryRun
 	 *            when <code>false</code> than duplicates are moved to the
 	 *            {@link #destinationFolder}
@@ -69,7 +83,19 @@ public class Cleaner {
 		}
 	}
 
-	public void doCleanUp() throws IllegalArgumentException {
+	public void doCleanUp() {
+		if (!sourceFolder.exists()) {
+			logger.error(
+					"The Eclipse installation hasn't found at '{}', the location doesn't exists. \n\n The program terminated with an error!",
+					sourceFolder);
+			return;
+		}
+
+		if (destinationFolder.exists()) {
+			logger.warn("The destination folder '{}' already exists! The duplicates will be move to this folder.",
+					destinationFolder);
+		}
+
 		doCleanUpFor("plugins");
 		doCleanUpFor("features");
 
@@ -80,7 +106,7 @@ public class Cleaner {
 	}
 
 	private void doCleanUpFor(String type) {
-		File destinationTypeFolder = Paths.get(destinationFolder.getAbsolutePath(), type).toFile();
+		File destinationTypeFolder = FileUtils.getFile(destinationFolder, type);
 
 		logger.info("Scanning Eclipse for {} at '{}'\n", type, sourceFolder);
 		Set<Artifact> artifacts = find(type);
@@ -126,6 +152,8 @@ public class Cleaner {
 
 		if (doRealCleanUp) {
 			logger.info("\nRemoved duplicates ({}) are located at '{}' !", type, destinationTypeFolder);
+		} else {
+			logger.info("\n(DRY-RUN) Removed duplicates ({}) will be located at '{}' !", type, destinationTypeFolder);
 		}
 	}
 }

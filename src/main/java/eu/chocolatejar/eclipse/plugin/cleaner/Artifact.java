@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014 Chocolate Jar, Andrej Zachar
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *******************************************************************************/
 package eu.chocolatejar.eclipse.plugin.cleaner;
 
 import java.io.File;
@@ -19,26 +34,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents a bundle based on folder or jar file
+ * Represents a bundle with a version. The version is obtained via manifest or
+ * via filename. The artifact can be file based (jar) or a folder.
+ * 
+ * Comparison is based on purely on the version.
+ * 
+ * HashCode and Equals are based on {@link #file} & {@link #bundleSymbolicName}
+ * & {@link #bundleVersion}.
  */
 public class Artifact implements Comparable<Artifact> {
 
 	private static final Logger logger = LoggerFactory.getLogger(Artifact.class);
 
-	private final File file;
+	private final File location;
 	private final String bundleSymbolicName;
 	private final Version bundleVersion;
 
 	private Artifact duplicate;
 
-	Artifact(File url, String bundleSymbolicName, String bundleVersion) {
-		this.file = url;
+	Artifact(File location, String bundleSymbolicName, String bundleVersion) {
+		this.location = location;
 		this.bundleSymbolicName = StringUtils.substringBefore(bundleSymbolicName, ";");
 		this.bundleVersion = new Version(bundleVersion);
 	}
 
+	/**
+	 * The location of this bundle.
+	 * 
+	 * @return a jar file or a folder
+	 */
 	public File getSource() {
-		return file;
+		return location;
 	}
 
 	public String getSymbolicName() {
@@ -50,11 +76,11 @@ public class Artifact implements Comparable<Artifact> {
 	}
 
 	/**
-	 * Parse bundle from folder or jar file using manifest, if not possible try
-	 * to use the file filename
+	 * Parses a bundle from a folder or a jar file using a manifest. If manifest
+	 * is unreadable uses the filename to obtain a version.
 	 * 
 	 * @param file
-	 *            with potential bundle to parse
+	 *            with a potential bundle to parse
 	 */
 	public static Artifact createFromFile(File file) {
 		Artifact a = null;
@@ -68,7 +94,7 @@ public class Artifact implements Comparable<Artifact> {
 				a = parseFromManifest(file, file);
 			}
 		} catch (Exception e) {
-			logger.warn("Unable to parse artifact from '{}' due to '{}', trying to parse from the filename.", file,
+			logger.warn("Unable to parse an artifact from '{}' due to '{}', trying to parse from the filename.", file,
 					e.getMessage());
 			a = null;
 		}
@@ -78,7 +104,7 @@ public class Artifact implements Comparable<Artifact> {
 		try {
 			a = parseFromFileName(file);
 		} catch (Exception e) {
-			logger.error("Skipping: Unable to parse version from '{}'!", file);
+			logger.error("Skipping: Unable to parse a version from '{}'!", file);
 			a = null;
 		}
 		return a;
@@ -89,7 +115,7 @@ public class Artifact implements Comparable<Artifact> {
 		Manifest bundleManifest = readManifestfromJarOrDirectory(manifest);
 
 		if (bundleManifest == null) {
-			logger.debug("Invalid manifest {}", manifest);
+			logger.debug("The invalid manifest {}", manifest);
 		}
 		Attributes attributes = bundleManifest.getMainAttributes();
 		String bundleSymbolicName = getRequiredHeader(attributes, Constants.BUNDLE_SYMBOLICNAME);
@@ -192,7 +218,7 @@ public class Artifact implements Comparable<Artifact> {
 		int result = 1;
 		result = prime * result + ((bundleSymbolicName == null) ? 0 : bundleSymbolicName.hashCode());
 		result = prime * result + ((bundleVersion == null) ? 0 : bundleVersion.hashCode());
-		result = prime * result + ((file == null) ? 0 : file.hashCode());
+		result = prime * result + ((location == null) ? 0 : location.hashCode());
 		return result;
 	}
 
@@ -215,10 +241,10 @@ public class Artifact implements Comparable<Artifact> {
 				return false;
 		} else if (!bundleVersion.equals(other.bundleVersion))
 			return false;
-		if (file == null) {
-			if (other.file != null)
+		if (location == null) {
+			if (other.location != null)
 				return false;
-		} else if (!file.equals(other.file))
+		} else if (!location.equals(other.location))
 			return false;
 		return true;
 	}
@@ -231,6 +257,10 @@ public class Artifact implements Comparable<Artifact> {
 		this.duplicate = duplicate;
 	}
 
+	/**
+	 * @return whether the artifact is located within the
+	 *         <strong>dropins</strong> folder
+	 */
 	public boolean isInDropinsFolder() {
 		return getSource().toString().contains("dropins");
 	}

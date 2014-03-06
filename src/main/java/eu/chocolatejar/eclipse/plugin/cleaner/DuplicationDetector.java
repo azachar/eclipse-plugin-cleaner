@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2014 Chocolate Jar, Andrej Zachar
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *******************************************************************************/
 package eu.chocolatejar.eclipse.plugin.cleaner;
 
 import java.util.Collections;
@@ -7,9 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Detects duplicates between bundles, the older bundles are considered as
- * duplicates or bundle that exists on multiple places
- * 
+ * Detects duplicates between bundles. The bundle with the older version or with
+ * the same version are considered to be duplicates. If bundle exists on
+ * multiple places the location that contains <code>dropins</code> folder is
+ * considered to be a duplicate.
  */
 public class DuplicationDetector {
 	final Set<Artifact> duplicates = new HashSet<>();
@@ -34,9 +50,11 @@ public class DuplicationDetector {
 						// choose rather from dropin folder
 						if (current.isInDropinsFolder()) {
 							duplicates.add(current);
-							map.put(symbolicName, artifact); // replace with
+							map.put(symbolicName, artifact); // replace with a
 																// potentially
-																// non dropins folder variant
+																// non dropins
+																// folder
+																// variant
 						} else {
 							duplicates.add(artifact);
 						}
