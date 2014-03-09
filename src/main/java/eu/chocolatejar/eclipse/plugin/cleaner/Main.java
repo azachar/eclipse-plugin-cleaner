@@ -53,14 +53,14 @@ public class Main {
 		// create the Options
 		Options options = new Options();
 		options.addOption(generateOption("s", "source", true,
-				"The path to the source folder with eclipse installation, default is ."));
+				"The path to an eclipse installation to clean up. The default is the current folder."));
 		options.addOption(generateOption(
 				"d",
 				"destination",
 				true,
-				"The path to the destination folder where duplicated bundles will be moved. The default is the absolute path to <source>/duplicates-<timestamp>"));
+				"The path to the folder where duplicated bundles will be moved. The default is the absolute path to <source>/duplicates-<timestamp>"));
 		options.addOption(generateOption("t", "test", false,
-				"Test - Enables dry run, no action will be take, only displays duplicates"));
+				"Test - Enables the dry run mode, no action will be taken, only displays duplicates."));
 		options.addOption(generateOption("h", "help", false, "show help"));
 
 		try {
@@ -124,7 +124,7 @@ public class Main {
 	private void showHelp(Options options) {
 		// automatically generate the help statement
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("Reinstall Cleaner", options);
+		formatter.printHelp("java -jar <eclipse-plugin-cleaner.jar> ", options, true);
 	}
 
 	@SuppressWarnings("static-access")

@@ -21,6 +21,7 @@ import java.io.File;
 
 import org.junit.Assume;
 import org.junit.Test;
+import org.osgi.framework.Version;
 
 public class ArtifactTest {
 
@@ -130,6 +131,20 @@ public class ArtifactTest {
 
 		assertThat(a.hashCode()).isNotZero();
 		assertThat(b.hashCode()).isNotZero();
+	}
+
+	@Test
+	public void comparisonOfQualifiersWithTimestamps() throws Exception {
+		Artifact a = new Artifact(new File("old/a_1.1.300.v20130514-0733.jar"), "a", "1.1.300.v20130514-0733");
+		Artifact b = new Artifact(new File("new/a_1.1.300.201402281424.jar"), "a", "1.1.300.201402281424");
+
+		assertThat(a.compareTo(b)).isNegative();
+	}
+
+	@Test
+	public void normalizeQualifier() throws Exception {
+		assertThat(Artifact.normalizeQualifier(new Version("1.2.300.v20130514-0733")).toString()).isEqualTo(
+				"1.2.300.201305140733");
 	}
 
 }

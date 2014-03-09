@@ -209,7 +209,13 @@ public class Artifact implements Comparable<Artifact> {
 
 	@Override
 	public int compareTo(Artifact o) {
-		return getVersion().compareTo(o.getVersion());
+		return normalizeQualifier(getVersion()).compareTo(normalizeQualifier(o.getVersion()));
+	}
+
+	protected static Version normalizeQualifier(Version orig) {
+		String normalizedQualifier = orig.getQualifier().replaceAll("v", "");
+		normalizedQualifier = normalizedQualifier.replaceAll("-", "");
+		return new Version(orig.getMajor(), orig.getMinor(), orig.getMicro(), normalizedQualifier);
 	}
 
 	@Override
