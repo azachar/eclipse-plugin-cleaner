@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.chocolatejar.eclipse</groupId>
 	<artifactId>plugin-cleaner</artifactId>
-	<version>0.2.1</version>
+	<version>0.2.2-SNAPSHOT</version>
 	<name>Eclipse Plugin Cleaner</name>
 	<description>Removes duplicated plugins &amp; features from your Eclipse installation</description>
 	<url>https://github.com/azachar/eclipse-plugin-cleaner</url>
@@ -10,7 +10,7 @@
 		<url>https://github.com/azachar/eclipse-plugin-cleaner</url>
 		<connection>scm:git:git://github.com/azachar/eclipse-plugin-cleaner.git</connection>
 		<developerConnection>scm:git:git@github.com:azachar/eclipse-plugin-cleaner.git</developerConnection>
-	  <tag>plugin-cleaner-0.2.1</tag>
+	  <tag>HEAD</tag>
   </scm>
 	<licenses>
 		<license>
