@@ -1,0 +1,109 @@
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	you under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+
+<project xmlns="http://maven.apache.org/DECORATION/1.3.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/DECORATION/1.3.0 http://maven.apache.org/xsd/decoration-1.3.0.xsd">
+	<skin>
+		<groupId>lt.velykis.maven.skins</groupId>
+		<artifactId>reflow-maven-skin</artifactId>
+		<version>1.1.0</version>
+	</skin>
+	<googleAnalyticsAccountId>UA-48347805-1</googleAnalyticsAccountId>
+	<custom>
+		<reflowSkin>
+			<protocolRelativeURLs>false</protocolRelativeURLs>
+			<smoothScroll>true</smoothScroll>
+			<theme>default</theme>
+			<highlightJs>true</highlightJs>
+			<highlightJsTheme>github</highlightJsTheme>
+			<brand>
+				<name>Eclipse Plugin Cleaner</name>
+				<href>http://blog.chocolatejar.eu/eclipse-plugin-cleaner</href>
+			</brand>
+			<slogan>Clean up your Eclipse Installation</slogan>
+			<titleTemplate>%2$s | %1$s</titleTemplate>
+			<toc>top</toc>
+			<topNav>Main|Download</topNav>
+			<bottomNav>
+				<column>Main</column>
+				<column>Download</column>
+				<column>reports</column>
+			</bottomNav>
+			<bottomDescription>This tool allows you to upgrade or clean up your Eclipse
+				easily!</bottomDescription>
+			<pages>
+				<index>
+					<!-- no breadcrumbs on the main index page -->
+					<breadcrumbs>false</breadcrumbs>
+					<!-- no ToC on the main index page -->
+					<toc>false</toc>
+					<markPageHeader>false</markPageHeader>
+					<sections>
+						<body />
+						<sidebar />
+					</sections>
+				</index>
+				<contribute>
+					<breadcrumbs>false</breadcrumbs>
+				</contribute>
+				<!-- Disable source highlighting for Maven reports -->
+				<source-repository>
+					<highlightJs>false</highlightJs>
+				</source-repository>
+				<issue-tracking>
+					<highlightJs>false</highlightJs>
+					<toc>false</toc>
+				</issue-tracking>
+				<license>
+					<highlightJs>false</highlightJs>
+					<toc>false</toc>
+				</license>
+				<!-- Disable ToC for some Maven reports -->
+				<project-info>
+					<toc>false</toc>
+				</project-info>
+				<github-report>
+					<toc>false</toc>
+				</github-report>
+				<dependencies>
+					<tocTopMax>4</tocTopMax>
+				</dependencies>
+			</pages>
+		</reflowSkin>
+	</custom>
+
+	<bannerLeft>
+		<name>Eclipse Plugin Cleaner</name>
+		<href>http://blog.chocolatejar.eu/eclipse-plugin-cleaner</href>
+	</bannerLeft>
+
+	<body>
+		<breadcrumbs>
+			<item name="Eclipse Plugin Cleaner" href="/" />
+		</breadcrumbs>
+
+		<menu name="Main" inherit="top">
+			<item name="Home" href="./" />
+			<item name="Usage" href="usage.html" />
+			<item name="Contribution" href="contribution.html" />
+		</menu>
+		<menu name="Download" inherit="top">
+			<item name="Latest Release"
+				href="http://github.com/azachar/eclipse-plugin-cleaner/releases/" />
+			<item name="Source code" href="http://github.com/azachar/eclipse-plugin-cleaner/" />
+		</menu>
+		<menu name="Maven documentation" ref="reports" inherit="bottom" />
+	</body>
+
+	<publishDate position="bottom" format="yyyy-MM-dd" />
+	<version position="bottom" />
+</project>
