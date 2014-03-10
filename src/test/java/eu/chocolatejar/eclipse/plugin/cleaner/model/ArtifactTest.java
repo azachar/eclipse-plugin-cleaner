@@ -13,7 +13,7 @@
  *See the License for the specific language governing permissions and
  *limitations under the License.
  *******************************************************************************/
-package eu.chocolatejar.eclipse.plugin.cleaner;
+package eu.chocolatejar.eclipse.plugin.cleaner.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -131,6 +131,13 @@ public class ArtifactTest {
 
 		assertThat(a.hashCode()).isNotZero();
 		assertThat(b.hashCode()).isNotZero();
+	}
+
+	@Test
+	public void comparisonWithNull() throws Exception {
+		Artifact a = new Artifact(new File("old/a_1.1.300.v20130514-0733.jar"), "a", "1.1.300.v20130514-0733");
+
+		assertThat(a.compareTo(null)).isPositive();
 	}
 
 	@Test

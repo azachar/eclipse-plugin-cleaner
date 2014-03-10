@@ -7,7 +7,7 @@
 	</appender>
 
 	<logger name="eu.chocolatejar.eclipse.plugin.cleaner" level="info" />
-	<logger name="eu.chocolatejar.eclipse.plugin.cleaner.Artifact"
+	<logger name="eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact"
 		level="error" />
 
 	<root level="ERROR">

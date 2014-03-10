@@ -13,7 +13,7 @@
  *See the License for the specific language governing permissions and
  *limitations under the License.
  *******************************************************************************/
-package eu.chocolatejar.eclipse.plugin.cleaner;
+package eu.chocolatejar.eclipse.plugin.cleaner.model;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,9 +50,9 @@ public class Artifact implements Comparable<Artifact> {
 	private final String bundleSymbolicName;
 	private final Version bundleVersion;
 
-	private Artifact duplicate;
+	private Artifact master;
 
-	Artifact(File location, String bundleSymbolicName, String bundleVersion) {
+	public Artifact(File location, String bundleSymbolicName, String bundleVersion) {
 		this.location = location;
 		this.bundleSymbolicName = StringUtils.substringBefore(bundleSymbolicName, ";");
 		this.bundleVersion = new Version(bundleVersion);
@@ -203,12 +203,20 @@ public class Artifact implements Comparable<Artifact> {
 
 	@Override
 	public String toString() {
-		return "'" + getSymbolicName() + "'" + " with the version '" + getVersion()
-				+ (getDuplicate() == null ? "" : "' duplicates '" + getDuplicate().getVersion() + "'");
+		return getArtifactNameVersionAndLocation()
+				+ (getMaster() == null ? "" : " duplicates " + getMaster().getArtifactNameVersionAndLocation());
+	}
+
+	private String getArtifactNameVersionAndLocation() {
+		return "'" + getSymbolicName() + " #" + getVersion() + " @"
+				+ FilenameUtils.getPathNoEndSeparator(location.getPath()) + "'";
 	}
 
 	@Override
 	public int compareTo(Artifact o) {
+		if (o == null) {
+			return 1; // is newer than nothing
+		}
 		return normalizeQualifier(getVersion()).compareTo(normalizeQualifier(o.getVersion()));
 	}
 
@@ -255,12 +263,28 @@ public class Artifact implements Comparable<Artifact> {
 		return true;
 	}
 
-	public Artifact getDuplicate() {
-		return duplicate;
+	/**
+	 * Indicates which artifact is duplicated by this artifact. The master
+	 * artifact represents a "version parent" of this artifact.
+	 * 
+	 * The value of this field is set by a {@link Detector}.
+	 * 
+	 * @return Non-<code>null</code> value of the master indicates that this
+	 *         artifact is a duplicate of the master.
+	 * 
+	 *         <code>null</code> indicates that this artifact is master and has
+	 *         no duplicates e.g. has no better alternative during a
+	 *         duplications detection.
+	 */
+	public Artifact getMaster() {
+		return master;
 	}
 
-	public void setDuplicate(Artifact duplicate) {
-		this.duplicate = duplicate;
+	/**
+	 * @see #getMaster()
+	 */
+	public void setMaster(Artifact parent) {
+		this.master = parent;
 	}
 
 	/**
@@ -268,7 +292,11 @@ public class Artifact implements Comparable<Artifact> {
 	 *         <strong>dropins</strong> folder
 	 */
 	public boolean isInDropinsFolder() {
-		return getSource().toString().contains("dropins");
+		// TODO FIX getsource for tests
+		if (getSource() == null) { // for tests purpouses only
+			return false;
+		}
+		return getSource().toString().contains("/dropins/");
 	}
 
 }

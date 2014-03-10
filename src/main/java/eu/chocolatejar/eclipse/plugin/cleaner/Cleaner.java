@@ -24,6 +24,9 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact;
+import eu.chocolatejar.eclipse.plugin.cleaner.model.CleaningMode;
+
 /**
  * Finds duplicate bundles and move them to a back up folder
  */
@@ -37,11 +40,16 @@ public class Cleaner {
 	private File sourceFolder;
 	private boolean doRealCleanUp;
 
+	private CleaningMode cleaningMode;
+
 	/**
+	 * Create an instance of the Cleaner class and set initial cleaning
+	 * parameters.
+	 * 
 	 * @param sourceFolder
-	 *            The base directory to scan for Eclipse Installation.
+	 *            The base directory to scan for an Eclipse Installation.
 	 * @param destinationFolder
-	 *            The destination folder for moving duplicates
+	 *            The destination folder for moving duplicates to
 	 * @param dryRun
 	 *            when <code>false</code> than duplicates are moved to the
 	 *            {@link #destinationFolder}
@@ -49,10 +57,14 @@ public class Cleaner {
 	 *            when <code>true</code> than duplicates are just displayed, no
 	 *            action is taken!
 	 * 
+	 * @param mode
+	 *            The cleaning mode that indicates the method for resolving
+	 *            duplicated artifacts.
 	 */
-	public Cleaner(File sourceFolder, File destinationFolder, boolean dryRun) {
+	public Cleaner(File sourceFolder, File destinationFolder, boolean dryRun, CleaningMode mode) {
 		this.sourceFolder = sourceFolder;
 		this.destinationFolder = destinationFolder;
+		this.cleaningMode = mode;
 		this.doRealCleanUp = !dryRun;
 	}
 
@@ -84,7 +96,9 @@ public class Cleaner {
 	}
 
 	public void doCleanUp() {
-		logger.info("\n Parameters summary\n\n Eclipse source folder: '{}'\n Move duplicates to: '{}'\n Dry run: '{}'\n\n",sourceFolder,destinationFolder, doRealCleanUp?"No":"Yes");
+		logger.info(
+				"\n Parameters summary\n\n Eclipse source folder: '{}'\n Move duplicates to: '{}'\n Dry run: '{}'\n Cleaning mode: '{}'\n\n",
+				sourceFolder, destinationFolder, doRealCleanUp ? "No" : "Yes", cleaningMode);
 
 		if (!sourceFolder.exists()) {
 			logger.error(
@@ -97,7 +111,7 @@ public class Cleaner {
 			logger.warn("The destination folder '{}' already exists! The duplicates will be move to this folder.",
 					destinationFolder);
 		}
-		
+
 		doCleanUpFor("plugins");
 		doCleanUpFor("features");
 
@@ -117,15 +131,17 @@ public class Cleaner {
 			return;
 		}
 
-		DuplicationDetector dp = new DuplicationDetector(artifacts);
-		logger.info("\n\nFound {} duplicates from {} {} \n", dp.getDuplicates().size(), artifacts.size(), type);
+		DuplicationDetectorFactory detector = new DuplicationDetectorFactory(cleaningMode);
+		final Set<Artifact> duplicates = detector.getDuplicates(artifacts);
+
+		logger.info("\n\nFound {} duplicates from {} {} \n", duplicates.size(), artifacts.size(), type);
 
 		if (doRealCleanUp) {
 			logger.info("\nCleaning...");
 			logger.info(" The duplicates will be moved to the folder '{}'\n", destinationTypeFolder);
 		}
 
-		for (Artifact artifact : dp.getDuplicates()) {
+		for (Artifact artifact : duplicates) {
 			if (doRealCleanUp) {
 				logger.info("Cleaning up: {}", artifact);
 				try {
