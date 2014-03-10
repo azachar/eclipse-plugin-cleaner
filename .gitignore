@@ -8,3 +8,5 @@
 # Binaries #
 /bin
 /target
+/pom.xml.releaseBackup
+/release.properties
