@@ -13,7 +13,6 @@
 <booleanAttribute key="M2_WORKSPACE_RESOLUTION" value="false"/>
 <mapAttribute key="org.eclipse.debug.core.environmentVariables">
 <mapEntry key="JAVA_HOME" value="${ee_home:JavaSE-1.7}"/>
-<mapEntry key="dryRun" value="true"/>
 </mapAttribute>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
