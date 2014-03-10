@@ -296,7 +296,7 @@ public class Artifact implements Comparable<Artifact> {
 		if (getSource() == null) { // for tests purpouses only
 			return false;
 		}
-		return getSource().toString().contains("/dropins/");
+		return getSource().toString().contains(File.separator + "dropins" + File.separator);
 	}
 
 }

@@ -17,7 +17,7 @@ package eu.chocolatejar.eclipse.plugin.cleaner;
 
 import java.util.Set;
 
-import eu.chocolatejar.eclipse.plugin.cleaner.detector.DropinOnlyDuplicationDetector;
+import eu.chocolatejar.eclipse.plugin.cleaner.detector.DropinsOnlyDuplicationDetector;
 import eu.chocolatejar.eclipse.plugin.cleaner.detector.PrefereDropinsDuplicationDetector;
 import eu.chocolatejar.eclipse.plugin.cleaner.detector.UnlimitedDuplicationDetector;
 import eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact;
@@ -55,7 +55,7 @@ public class DuplicationDetectorFactory implements Detector {
 		switch (cleaningMode) {
 
 		case dropinsOnly:
-			return new DropinOnlyDuplicationDetector();
+			return new DropinsOnlyDuplicationDetector();
 
 		case unlimited:
 			return new UnlimitedDuplicationDetector();

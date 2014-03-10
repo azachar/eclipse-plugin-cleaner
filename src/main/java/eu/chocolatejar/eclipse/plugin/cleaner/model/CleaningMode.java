@@ -15,7 +15,7 @@
  *******************************************************************************/
 package eu.chocolatejar.eclipse.plugin.cleaner.model;
 
-import eu.chocolatejar.eclipse.plugin.cleaner.detector.DropinOnlyDuplicationDetector;
+import eu.chocolatejar.eclipse.plugin.cleaner.detector.DropinsOnlyDuplicationDetector;
 import eu.chocolatejar.eclipse.plugin.cleaner.detector.PrefereDropinsDuplicationDetector;
 import eu.chocolatejar.eclipse.plugin.cleaner.detector.UnlimitedDuplicationDetector;
 
@@ -32,7 +32,7 @@ public enum CleaningMode {
 	unlimited,
 
 	/**
-	 * @see DropinOnlyDuplicationDetector
+	 * @see DropinsOnlyDuplicationDetector
 	 */
 	dropinsOnly,
 
