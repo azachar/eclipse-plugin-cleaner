@@ -58,18 +58,25 @@ public class Main {
 		options.addOption(generateOption("h", "help", false, "Shows this help."));
 
 		options.addOption(generateOption("s", "source", true,
-				"The path to an Eclipse installation to clean up. The default is the current folder."));
+				"Path to Eclipse installation. The default is the current folder."));
 		options.addOption(generateOption(
 				"d",
 				"destination",
 				true,
-				"The path to a folder where duplicated bundles will be moved. The default is the absolute path to <source>/duplicates-<timestamp>."));
+				"Path to folder where duplicated bundles will be moved. The default is the absolute path to <source>/duplicates-<timestamp>."));
 		options.addOption(generateOption("t", "test", false,
 				"Test - Enables a dry run mode, e.g. no action will be taken."));
 
-		options.addOption(generateOption("m", "mode", true,
-				"Allows to specify a duplication detection mode as follows: " + CleaningMode.dropinsOnly.name() + " (default), "
-						+ CleaningMode.prefereDropins.name() + ", " + CleaningMode.unlimited.name()+"."));
+		options.addOption(generateOption(
+				"m",
+				"mode",
+				true,
+				"To specify a duplication detection mode as follows: \n'"
+						+ CleaningMode.dropinsOnly.name()
+						+ "' (default) Duplicates can only be artifacts located in the ``dropins`` folder.\n'"
+						+ CleaningMode.prefereDropins.name()
+						+ "' If there are two bundles with the same version, then the bundle that is in the ``dropins`` folder is considered to be duplicated. If both of them are from a ``non-dropins`` folder, than the first one is kept and the second one is marked as a duplicate.\n'"
+						+ CleaningMode.unlimited.name() + "' Resolves duplicates regardless their location."));
 
 		try {
 			// parse the command line arguments
