@@ -119,7 +119,7 @@
 						<ul id="toc" class="nav">
 						<li class="toplevel"><a href="#usage" title="Usage">Usage</a></li>
 						<li class="divider-vertical"></li>
-						<li class="toplevel"><a href="#command_line_parameters" title="Command line parameters">Command line parameters</a></li>
+						<li class="toplevel"><a href="#command_line_parameters" title="Command Line Parameters">Command Line Parameters</a></li>
 						<li class="divider-vertical"></li>
 						<li class="toplevel"><a href="#known_limitations" title="Known Limitations">Known Limitations</a></li>
 						</ul>
@@ -137,8 +137,8 @@
  <h1 id="usage">Usage</h1>
 </div> 
 <ol style="list-style-type: decimal"> 
- <li>Install a brand new Eclipse into your new location, for example <tt>eclipse-new</tt></li> 
- <li> <p>Copy into the folder <tt>eclipse-new/dropins</tt> your old Eclipse installation, e.g. copy <tt>ecipse-old/plugins</tt> and <tt>eclipse-old/features</tt> into <tt>eclipse-new/dropins/eclipse</tt>, so you will have the following file structure:</p> 
+ <li>Install a brand new Eclipse to your new location, for example <tt>eclipse-new</tt></li> 
+ <li> <p>Copy your old Eclipse installation into the folder <tt>eclipse-new/dropins</tt>, e.g. Copy <tt>eclipse-old/plugins</tt> and <tt>eclipse-old/features</tt> into <tt>eclipse-new/dropins/eclipse</tt>, to have the following structure:</p> 
   <div class="source"> 
    <pre>|-- eclipse-new
 |   |-- features (new)
@@ -149,41 +149,40 @@
 |           |-- plugins (old)
 </pre> 
   </div></li> 
- <li> <p>Build <tt>eclipse-plugin-cleaner</tt> or download from <a class="externalLink" href="https://github.com/azachar/eclipse-plugin-cleaner/releases">https://github.com/azachar/eclipse-plugin-cleaner/releases</a> compiled jar with Java 7.</p></li> 
- <li> <p>Copy <tt>plugin-cleaner-x.x.x-jar-with-dependencies.jar</tt> into the folder <tt>eclipse-new</tt> and execute this command</p> 
+ <li> <p>Download the latest release of <tt>eclipse-plugin-cleaner</tt> from <a class="externalLink" href="https://github.com/azachar/eclipse-plugin-cleaner/releases">https://github.com/azachar/eclipse-plugin-cleaner/releases</a> (compiled with Java 7) or compile it from the source code.</p></li> 
+ <li> <p>Copy <tt>plugin-cleaner-x.x.x-jar-with-dependencies.jar</tt> into the folder <tt>eclipse-new</tt> and execute the following command</p> 
   <div class="source"> 
    <pre>java -jar plugin-cleaner-x.x.x.-jar-with-dependencies.jar
 </pre> 
   </div></li> 
 </ol> 
 <ul> 
- <li>You can specify the option <tt>-test</tt> to run the dry mode that simulates changes without any modifications!</li> 
- <li>For more options please use the option <tt>-help</tt></li> 
- <li><b>Duplicates are moved into the folder <tt>&lt;source-folder&gt;\duplicates_&lt;timestamp&gt;</tt></b>, e.g. in <tt>eclipse-new\duplicates_&lt;timestamp&gt;</tt></li> 
+ <li>You can specify the option <tt>-test</tt> to run the dry mode that simulates changes without any modifications.</li> 
+ <li><b>Duplicates are moved into the folder <tt>&lt;source-folder&gt;\duplicates_&lt;timestamp&gt;</tt></b>, e.g. in <tt>eclipse-new\duplicates_&lt;timestamp&gt;</tt>.</li> 
 </ul> 
 <ol style="list-style-type: decimal"> 
- <li>Run your new Eclipse</li> 
+ <li>Run the new Eclipse.</li> 
  <li>Delete <tt>eclipse-new\duplicates_&lt;timestamp&gt;</tt> if everything works.</li> 
- <li>Now you have the brand new installation of Eclipse with your custom plugins!</li> 
+ <li>Now you have a brand new installation of Eclipse with your custom plugins!</li> 
 </ol> 
-<h1 id="command_line_parameters">Command line parameters</h1> 
+<h1 id="command_line_parameters">Command Line Parameters</h1> 
 <p>usage: <tt>java -jar plugin-cleaner-XXX-jar-with-dependencies.jar [-d &lt;destination&gt;] [-h] [-m &lt;mode&gt;] [-s &lt;source&gt;] [-t]</tt></p> 
 <ul> 
- <li><tt>-s,--source &lt;source&gt;</tt> The path to an Eclipse installation to clean up. The default is the current folder.</li> 
- <li><tt>-d,--destination &lt;destination&gt;</tt> The path to a folder where duplicated bundles will be moved. The default is the absolute path to <tt>&lt;source&gt;/duplicates-&lt;timestamp&gt;</tt>.</li> 
- <li> <p><b><tt>-m,--mode &lt;mode&gt;</tt></b> Allows to specify a duplication detection mode as follows: </p> 
+ <li><tt>-s,--source &lt;source&gt;</tt> Path to Eclipse installation. The default is the current folder.</li> 
+ <li><tt>-d,--destination &lt;destination&gt;</tt> Path to folder where duplicated bundles will be moved. The default is the absolute path to <tt>&lt;source&gt;/duplicates-&lt;timestamp&gt;</tt>.</li> 
+ <li> <p><b><tt>-m,--mode &lt;mode&gt;</tt></b> To specify a duplication detection mode as follows: </p> 
   <ul> 
-   <li><b><tt>dropinsOnly</tt></b> (default) Duplicates could be only artifacts located in the <tt>dropins</tt> folder.</li> 
-   <li><tt>prefereDropins</tt> If there are two bundles with the same version then the bundle that is in the <tt>dropins</tt> folder is considered to be duplicated. If both of them are from a <tt>non-dropins</tt> folder than first come is kept the second one is marked as a duplicate.</li> 
+   <li><b><tt>dropinsOnly</tt></b> (default) Duplicates can only be artifacts located in the <tt>dropins</tt> folder.</li> 
+   <li><tt>prefereDropins</tt> If there are two bundles with the same version, then the bundle that is in the <tt>dropins</tt> folder is considered to be duplicated. If both of them are from a <tt>non-dropins</tt> folder, than the first one is kept and the second one is marked as a duplicate.</li> 
    <li><tt>unlimited</tt> Resolves duplicates regardless their location.</li> 
   </ul></li> 
  <li> <p><tt>-t,--test</tt> Enables a dry run mode, e.g. no action will be taken.</p></li> 
  <li><tt>-h,--help</tt> Shows help.</li> 
 </ul> 
 <h1 id="known_limitations">Known Limitations</h1> 
-<p>The bundle duplications resolving is based on a fast version duplication analysis.</p> 
-<p>In the Eclipse (and in any other OSGI enabled) application you can have a bundle that depends on multiple versions of a different bundle. Typically Eclipse doesn’t contains multiple versions of the same bundle, but if your installation contains such a setup than additional actions are required.</p> 
-<p>After you do the clean up by this tool go to Eclipse, choose <tt>Window -&gt; Show View -&gt; Error Log</tt> and check if there is any missing required bundle since you have done the clean up. If so simply move missing required features and bundles from the duplicated folder back to your <tt>eclipse-new/features</tt> and/or <tt>eclipse-new/plugins</tt> or <tt>eclipse-new/dropins</tt> folders.</p>
+<p>The bundle duplication resolution is based on a quick duplication analysis.</p> 
+<p>In the Eclipse application you can have a bundle that depends on multiple versions of a different bundle. Typically Eclipse doesn’t contain multiple versions of the same bundle, but if your installation set up this way, then additional actions are required.</p> 
+<p>After you do the clean up with this tool, go to Eclipse, choose <tt>Window -&gt; Show View -&gt; Error Log</tt> and check if any required bundles are missing as you have completed the clean up. If so, simply move the missing required features and bundles from the duplicated folder back to your <tt>eclipse-new/features</tt> and/or <tt>eclipse-new/plugins</tt> or <tt>eclipse-new/dropins</tt> folders.</p>
 			</div>
 		</div>
 	</div>
