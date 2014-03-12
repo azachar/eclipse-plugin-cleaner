@@ -165,9 +165,7 @@
 							</execution>
 						</executions>
 						<configuration>
-							<releaseProfiles>site,release</releaseProfiles>
 							<tagNameFormat>v@{project.version}</tagNameFormat>
-							<preparationGoals>clean verify site</preparationGoals>
 						</configuration>
 					</plugin>
 					<plugin>
