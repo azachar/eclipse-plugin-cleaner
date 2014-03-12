@@ -18,14 +18,24 @@ package eu.chocolatejar.eclipse.plugin.cleaner;
 import static eu.chocolatejar.eclipse.plugin.cleaner.util.DropinsFilter.DROPINS;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.turbo.TurboFilter;
+import ch.qos.logback.core.spi.FilterReply;
 import eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact;
 import eu.chocolatejar.eclipse.plugin.cleaner.model.CleaningMode;
 
@@ -35,6 +45,8 @@ import eu.chocolatejar.eclipse.plugin.cleaner.model.CleaningMode;
 public class Cleaner {
 
     private static final Logger logger = LoggerFactory.getLogger(Cleaner.class);
+
+    private static final Marker RELATIVE_PATH_SUPPORT = MarkerFactory.getMarker("RELATIVE_PATH_SUPPORT");
 
     private static final String FEATURES = "features";
     private static final String PLUGINS = "plugins";
@@ -57,7 +69,7 @@ public class Cleaner {
      * @param eclipseFolder
      *            The base directory to scan for an Eclipse Installation.
      * @param backupFolder
-     *            The destination folder for duplicates back up
+     *            The destination folder for duplicates to back up
      * @param dryRun
      *            when <code>false</code> than duplicates are moved to the
      *            {@link #backupFolder}
@@ -68,13 +80,20 @@ public class Cleaner {
      * @param mode
      *            The cleaning mode that indicates the method for resolving
      *            duplicated artifacts.
+     * 
+     * @param showRelativePaths
+     *            Shrinks paths of artifacts in the console output to relative
+     *            paths with the sourceFolder.
      */
-    public Cleaner(File sourceFolder, File destinationFolder, boolean dryRun, CleaningMode mode) {
-        this.eclipseFolder = sourceFolder;
-        this.backupFolder = destinationFolder;
+    public Cleaner(File eclipseFolder, File backupFolder, boolean dryRun, CleaningMode mode, boolean showRelativePaths) {
+        this.eclipseFolder = eclipseFolder;
+        this.backupFolder = backupFolder;
         this.cleaningMode = mode;
         this.dryRun = dryRun;
         this.detector = new DuplicationDetectorFactory(cleaningMode);
+        if (showRelativePaths) {
+            enableRelativePathsInConsoleByLogFilter();
+        }
     }
 
     /**
@@ -134,7 +153,7 @@ public class Cleaner {
 
     private void showDuplicates(Set<Artifact> duplicates) {
         for (Artifact a : duplicates) {
-            logger.info("{}", a);
+            logger.info(RELATIVE_PATH_SUPPORT, "{}", a);
         }
     }
 
@@ -150,7 +169,7 @@ public class Cleaner {
         File destinationTypeFolder = FileUtils.getFile(backupFolder, type);
 
         for (Artifact artifact : duplicates) {
-            logger.info("Cleaning {}", artifact);
+            logger.info(RELATIVE_PATH_SUPPORT, "Cleaning {}", artifact);
             try {
                 FileUtils.moveToDirectory(artifact.getLocation(), destinationTypeFolder, true);
                 logger.info(" OK");
@@ -206,5 +225,34 @@ public class Cleaner {
                 artifacts.add(a);
             }
         }
+    }
+
+    private class RelativePathFilter extends TurboFilter {
+
+        private final String eclipseReplace = FilenameUtils.getFullPath(eclipseFolder.getPath());
+        private final String backupReplace = FilenameUtils.getFullPath(backupFolder.getPath());
+
+        @Override
+        public FilterReply decide(Marker marker, ch.qos.logback.classic.Logger logger, Level level, String format,
+                Object[] params, Throwable t) {
+
+            if (RELATIVE_PATH_SUPPORT.equals(marker) && level == Level.INFO && t == null) {
+                List<String> newParams = new ArrayList<>();
+                for (Object object : params) {
+                    String replace = object.toString();
+                    replace = StringUtils.replace(replace, eclipseReplace, "");
+                    replace = StringUtils.replace(replace, backupReplace, "");
+                    newParams.add(replace);
+                }
+                logger.info(format, newParams.toArray());
+                return FilterReply.DENY;
+            }
+            return FilterReply.NEUTRAL;
+        }
+    }
+
+    private void enableRelativePathsInConsoleByLogFilter() {
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        lc.addTurboFilter(new RelativePathFilter());
     }
 }

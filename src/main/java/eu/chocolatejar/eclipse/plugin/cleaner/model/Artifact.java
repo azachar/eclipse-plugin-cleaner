@@ -169,12 +169,12 @@ public class Artifact implements Comparable<Artifact> {
     @Override
     public String toString() {
         return getArtifactNameVersionAndLocation()
-                + (getMaster() == null ? "" : " duplicates " + getMaster().getArtifactNameVersionAndLocation());
+                + (getMaster() == null ? "" : " DUPLICATES " + getMaster().getArtifactNameVersionAndLocation());
     }
 
     private String getArtifactNameVersionAndLocation() {
-        return "'" + getSymbolicName() + " #" + getVersion() + " @"
-                + FilenameUtils.getPathNoEndSeparator(location.getPath()) + "'";
+        return "'" + getSymbolicName() + " #" + getVersion() + " @" + FilenameUtils.getFullPath(location.getPath())
+                + "'";
     }
 
 }

@@ -62,6 +62,7 @@ public class Main {
         Options options = new Options();
 
         options.addOption(generateOption("h", "help", false, "Shows this help."));
+        options.addOption(generateOption("r", "relative", false, "Shows relative paths of artifacts."));
 
         options.addOption(generateOption("s", "source", true,
                 "Path to Eclipse installation. The default is the current folder."));
@@ -95,9 +96,11 @@ public class Main {
             File sourceFolder = new File(getParam("source", "."));
             File destinationFolder = new File(getParam("destination", getDefaultDestinationFolder(sourceFolder)));
             boolean dryRun = input.hasOption("test");
+            boolean showRelativePaths = input.hasOption("relative");
             final CleaningMode cleaningMode = getParamMode(CleaningMode.dropinsOnly);
 
-            Cleaner bundlesDuplicateCleaner = new Cleaner(sourceFolder, destinationFolder, dryRun, cleaningMode);
+            Cleaner bundlesDuplicateCleaner = new Cleaner(sourceFolder, destinationFolder, dryRun, cleaningMode,
+                    showRelativePaths);
             bundlesDuplicateCleaner.run();
 
         } catch (ParseException exp) {
