@@ -1,3 +1,4 @@
 eu.chocolatejar.eclipse.plugin.cleaner
 eu.chocolatejar.eclipse.plugin.cleaner.detector
 eu.chocolatejar.eclipse.plugin.cleaner.model
+eu.chocolatejar.eclipse.plugin.cleaner.util
