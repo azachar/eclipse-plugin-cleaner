@@ -31,58 +31,58 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class MainTest {
 
-	@Mock
-	CommandLine mockInput;
+    @Mock
+    CommandLine mockInput;
 
-	Main main;
+    Main main;
 
-	@Before
-	public void before() {
-		main = new Main();
-		when(mockInput.hasOption(eq("testParam"))).thenReturn(true);
-		main.input = mockInput;
-	}
+    @Before
+    public void before() {
+        main = new Main();
+        when(mockInput.hasOption(eq("testParam"))).thenReturn(true);
+        main.input = mockInput;
+    }
 
-	@Test
-	public void resolvingDefaultParams_forNull() {
-		when(mockInput.getOptionValue(eq("testParam"))).thenReturn(null);
-		String param = main.getParam("testParam", "defaultValue");
-		assertThat(param).isEqualTo("defaultValue");
-	}
+    @Test
+    public void resolvingDefaultParams_forNull() {
+        when(mockInput.getOptionValue(eq("testParam"))).thenReturn(null);
+        String param = main.getParam("testParam", "defaultValue");
+        assertThat(param).isEqualTo("defaultValue");
+    }
 
-	@Test
-	public void resolvingDefaultParams_forEmpty() {
-		when(mockInput.getOptionValue(eq("testParam"))).thenReturn("");
+    @Test
+    public void resolvingDefaultParams_forEmpty() {
+        when(mockInput.getOptionValue(eq("testParam"))).thenReturn("");
 
-		String param = main.getParam("testParam", "defaultValue");
-		assertThat(param).isEqualTo("defaultValue");
-	}
+        String param = main.getParam("testParam", "defaultValue");
+        assertThat(param).isEqualTo("defaultValue");
+    }
 
-	@Test
-	public void resolvingDefaultParams_forWhitespaces() {
-		when(mockInput.getOptionValue(eq("testParam"))).thenReturn("   ");
+    @Test
+    public void resolvingDefaultParams_forWhitespaces() {
+        when(mockInput.getOptionValue(eq("testParam"))).thenReturn("   ");
 
-		String param = main.getParam("testParam", "defaultValue");
-		assertThat(param).isEqualTo("defaultValue");
-	}
+        String param = main.getParam("testParam", "defaultValue");
+        assertThat(param).isEqualTo("defaultValue");
+    }
 
-	@Test
-	public void resolveParams() {
-		when(mockInput.getOptionValue(eq("testParam"))).thenReturn("userInput");
+    @Test
+    public void resolveParams() {
+        when(mockInput.getOptionValue(eq("testParam"))).thenReturn("userInput");
 
-		String param = main.getParam("testParam", "defaultValue");
-		assertThat(param).isEqualTo("userInput");
-	}
+        String param = main.getParam("testParam", "defaultValue");
+        assertThat(param).isEqualTo("userInput");
+    }
 
-	@Test
-	public void resolveDefaultFolder() {
-		String file = main.getDefaultDestinationFolder(new File("."));
-		assertThat(file).contains("." + File.separator + "duplicates_");
-	}
+    @Test
+    public void resolveDefaultFolder() {
+        String file = main.getDefaultDestinationFolder(new File("."));
+        assertThat(file).contains("." + File.separator + "duplicates_");
+    }
 
-	@Test
-	public void resolveDefaultFolder_isAbsolute() {
-		String file = main.getDefaultDestinationFolder(new File("."));
-		assertThat(file.startsWith(".")).isFalse();
-	}
+    @Test
+    public void resolveDefaultFolder_isAbsolute() {
+        String file = main.getDefaultDestinationFolder(new File("."));
+        assertThat(file.startsWith(".")).isFalse();
+    }
 }

@@ -22,53 +22,54 @@ import eu.chocolatejar.eclipse.plugin.cleaner.detector.PrefereDropinsDuplication
 import eu.chocolatejar.eclipse.plugin.cleaner.detector.UnlimitedDuplicationDetector;
 import eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact;
 import eu.chocolatejar.eclipse.plugin.cleaner.model.CleaningMode;
-import eu.chocolatejar.eclipse.plugin.cleaner.model.Detector;
+import eu.chocolatejar.eclipse.plugin.cleaner.model.DuplicationDetector;
 
 /**
- * Create a bundle duplication {@link Detector} based on a provided mode.
+ * Create a bundle duplication {@link DuplicationDetector} based on a provided
+ * mode.
  * 
  * @see CleaningMode
  */
-public class DuplicationDetectorFactory implements Detector {
+public class DuplicationDetectorFactory implements DuplicationDetector {
 
-	private final CleaningMode mode;
+    private final CleaningMode mode;
 
-	/**
-	 * Create a detector based on a provided mode.
-	 * 
-	 * @param mode
-	 *            - a {@link CleaningMode} that specify detector to resolve
-	 *            duplicates
-	 */
-	public DuplicationDetectorFactory(CleaningMode mode) {
-		this.mode = mode;
-	}
+    /**
+     * Create a detector based on a provided mode.
+     * 
+     * @param mode
+     *            - a {@link CleaningMode} that specify detector to resolve
+     *            duplicates
+     */
+    public DuplicationDetectorFactory(CleaningMode mode) {
+        this.mode = mode;
+    }
 
-	/**
-	 * Factory method to create a Detector object based on a provided
-	 * cleaningMode
-	 * 
-	 * @param cleaningMode
-	 * @return Detector instance, never <code>null</code>
-	 */
-	private Detector createDetector(CleaningMode cleaningMode) {
-		switch (cleaningMode) {
+    /**
+     * Factory method to create a DuplicationDetector object based on a provided
+     * cleaningMode
+     * 
+     * @param cleaningMode
+     * @return DuplicationDetector instance, never <code>null</code>
+     */
+    private DuplicationDetector createDetector(CleaningMode cleaningMode) {
+        switch (cleaningMode) {
 
-		case dropinsOnly:
-			return new DropinsOnlyDuplicationDetector();
+        case dropinsOnly:
+            return new DropinsOnlyDuplicationDetector();
 
-		case unlimited:
-			return new UnlimitedDuplicationDetector();
+        case unlimited:
+            return new UnlimitedDuplicationDetector();
 
-		case prefereDropins:
-		default:
-			return new PrefereDropinsDuplicationDetector();
-		}
-	}
+        case prefereDropins:
+        default:
+            return new PrefereDropinsDuplicationDetector();
+        }
+    }
 
-	@Override
-	public Set<Artifact> getDuplicates(Set<Artifact> artifacts) {
-		// we need to always return a new detector object for each call
-		return createDetector(mode).getDuplicates(artifacts);
-	}
+    @Override
+    public Set<Artifact> getDuplicates(Set<Artifact> artifacts) {
+        // we need to always return a new detector object for each call
+        return createDetector(mode).getDuplicates(artifacts);
+    }
 }

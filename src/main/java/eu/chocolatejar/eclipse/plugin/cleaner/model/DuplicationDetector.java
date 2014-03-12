@@ -20,15 +20,15 @@ import java.util.Set;
 /**
  * Detects duplicates between artifacts.
  */
-public interface Detector {
+public interface DuplicationDetector {
 
-	/**
-	 * Calculates duplicates.
-	 * 
-	 * @param artifacts
-	 *            to clean up
-	 * @return duplicated artifacts, never <code>null</code>
-	 */
-	public Set<Artifact> getDuplicates(Set<Artifact> artifacts);
+    /**
+     * Calculates duplicates.
+     * 
+     * @param artifacts
+     *            to clean up
+     * @return duplicated artifacts, never <code>null</code>
+     */
+    Set<Artifact> getDuplicates(Set<Artifact> artifacts);
 
 }

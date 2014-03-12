@@ -41,149 +41,156 @@ import eu.chocolatejar.eclipse.plugin.cleaner.model.CleaningMode;
  * Finds duplicates and move them to a back up directory.
  */
 public class Main {
-	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-	CommandLine input;
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-	public static void main(String[] args) {
-		new Main().run(args);
-	}
+    CommandLine input;
 
-	private void run(String[] args) {
-		logger.info("Welcome to Eclipse Plugin Cleaner {} (c) 2014 Chocolate Jar", getImplementationVersion());
+    /**
+     * Executes this program based on provided command line parameters
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
+        new Main().run(args);
+    }
 
-		// create the Options
-		Options options = new Options();
+    private void run(String[] args) {
+        logger.info("Welcome to Eclipse Plugin Cleaner {} (c) 2014 Chocolate Jar", getImplementationVersion());
 
-		options.addOption(generateOption("h", "help", false, "Shows this help."));
+        // create the Options
+        Options options = new Options();
 
-		options.addOption(generateOption("s", "source", true,
-				"Path to Eclipse installation. The default is the current folder."));
-		options.addOption(generateOption(
-				"d",
-				"destination",
-				true,
-				"Path to folder where duplicated bundles will be moved. The default is the absolute path to <source>/duplicates-<timestamp>."));
-		options.addOption(generateOption("t", "test", false,
-				"Test - Enables a dry run mode, e.g. no action will be taken."));
+        options.addOption(generateOption("h", "help", false, "Shows this help."));
 
-		options.addOption(generateOption(
-				"m",
-				"mode",
-				true,
-				"To specify a duplication detection mode as follows: \n'"
-						+ CleaningMode.dropinsOnly.name()
-						+ "' (default) Duplicates can only be artifacts located in the ``dropins`` folder.\n'"
-						+ CleaningMode.prefereDropins.name()
-						+ "' If there are two bundles with the same version, then the bundle that is in the ``dropins`` folder is considered to be duplicated. If both of them are from a ``non-dropins`` folder, than the first one is kept and the second one is marked as a duplicate.\n'"
-						+ CleaningMode.unlimited.name() + "' Resolves duplicates regardless their location."));
+        options.addOption(generateOption("s", "source", true,
+                "Path to Eclipse installation. The default is the current folder."));
+        options.addOption(generateOption(
+                "d",
+                "destination",
+                true,
+                "Path to folder where duplicated bundles will be moved. The default is the absolute path to <source>/duplicates-<timestamp>."));
+        options.addOption(generateOption("t", "test", false,
+                "Test - Enables a dry run mode, e.g. no action will be taken."));
 
-		try {
-			// parse the command line arguments
-			input = new GnuParser().parse(options, args);
-			if (input.hasOption("help")) {
-				showHelp(options);
-				return;
-			}
+        options.addOption(generateOption(
+                "m",
+                "mode",
+                true,
+                "To specify a duplication detection mode as follows: \n'"
+                        + CleaningMode.dropinsOnly.name()
+                        + "' (default) Duplicates can only be artifacts located in the ``dropins`` folder.\n'"
+                        + CleaningMode.prefereDropins.name()
+                        + "' If there are two bundles with the same version, then the bundle that is in the ``dropins`` folder is considered to be duplicated. If both of them are from a ``non-dropins`` folder, than the first one is kept and the second one is marked as a duplicate.\n'"
+                        + CleaningMode.unlimited.name() + "' Resolves duplicates regardless their location."));
 
-			File sourceFolder = new File(getParam("source", "."));
-			File destinationFolder = new File(getParam("destination", getDefaultDestinationFolder(sourceFolder)));
-			boolean dryRun = input.hasOption("test");
-			final CleaningMode cleaningMode = getParamMode(CleaningMode.dropinsOnly);
+        try {
+            // parse the command line arguments
+            input = new GnuParser().parse(options, args);
+            if (input.hasOption("help")) {
+                showHelp(options);
+                return;
+            }
 
-			Cleaner bundlesDuplicateCleaner = new Cleaner(sourceFolder, destinationFolder, dryRun, cleaningMode);
-			bundlesDuplicateCleaner.doCleanUp();
+            File sourceFolder = new File(getParam("source", "."));
+            File destinationFolder = new File(getParam("destination", getDefaultDestinationFolder(sourceFolder)));
+            boolean dryRun = input.hasOption("test");
+            final CleaningMode cleaningMode = getParamMode(CleaningMode.dropinsOnly);
 
-		} catch (ParseException exp) {
-			logger.error(exp.getMessage());
+            Cleaner bundlesDuplicateCleaner = new Cleaner(sourceFolder, destinationFolder, dryRun, cleaningMode);
+            bundlesDuplicateCleaner.doCleanUp();
 
-			showHelp(options);
-		}
-	}
+        } catch (ParseException exp) {
+            logger.error(exp.getMessage());
 
-	/**
-	 * Resolves the command line parameter "mode".
-	 * 
-	 * @param defaultMode
-	 *            If no mode specified in the command line this mode is used.
-	 */
-	private CleaningMode getParamMode(CleaningMode defaultMode) {
-		String mode = getParam("mode", defaultMode.name());
-		try {
-			return CleaningMode.valueOf(mode);
-		} catch (Exception e) {
-			return defaultMode;
-		}
-	}
+            showHelp(options);
+        }
+    }
 
-	/**
-	 * The default destination is based on the <source
-	 * folder>/duplicates_<timestamp>
-	 * 
-	 * @param sourceFolder
-	 *            cannot be <code>null</code>
-	 * @return absolute path
-	 */
-	String getDefaultDestinationFolder(File sourceFolder) {
-		assert sourceFolder != null;
-		File file = FileUtils.getFile(sourceFolder,
-				"duplicates_" + DateFormatUtils.ISO_DATETIME_FORMAT.format(new Date()));
-		return file.getAbsolutePath();
+    /**
+     * Resolves the command line parameter "mode".
+     * 
+     * @param defaultMode
+     *            If no mode specified in the command line this mode is used.
+     */
+    private CleaningMode getParamMode(CleaningMode defaultMode) {
+        String mode = getParam("mode", defaultMode.name());
+        try {
+            return CleaningMode.valueOf(mode);
+        } catch (Exception e) {
+            logger.warn("Unable to parse mode '{}', using default mode '{}'.", mode, defaultMode);
+            return defaultMode;
+        }
+    }
 
-	}
+    /**
+     * The default destination is based on the <source
+     * folder>/duplicates_<timestamp>
+     * 
+     * @param sourceFolder
+     *            cannot be <code>null</code>
+     * @return absolute path
+     */
+    String getDefaultDestinationFolder(File sourceFolder) {
+        assert sourceFolder != null;
+        File file = FileUtils.getFile(sourceFolder,
+                "duplicates_" + DateFormatUtils.ISO_DATETIME_FORMAT.format(new Date()));
+        return file.getAbsolutePath();
 
-	/**
-	 * Read version from jar manifest, if it fails the exception is swallow and
-	 * empty string is returned
-	 */
-	private String getImplementationVersion() {
-		try {
-			URLClassLoader cl = (URLClassLoader) Main.class.getClassLoader();
-			URL url = cl.findResource("META-INF/MANIFEST.MF");
-			Manifest manifest = new Manifest(url.openStream());
-			Attributes mainAttribs = manifest.getMainAttributes();
-			String version = mainAttribs.getValue("Implementation-Version");
-			if (version != null) {
-				return version;
-			}
-		} catch (Exception e) {
-			logger.trace("Unable to read a manifest version of this program.", e);
-		}
-		return "X.X.X.X";
-	}
+    }
 
-	private void showHelp(Options options) {
-		// automatically generate the help statement
-		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("java -jar plugin-cleaner-" + getImplementationVersion() + "-jar-with-dependencies.jar ",
-				"", options, " For more information visit http://blog.chocolatejar.eu/eclipse-plugin-cleaner", true);
-	}
+    /**
+     * Read version from jar manifest, if it fails the exception is swallow and
+     * empty string is returned
+     */
+    private String getImplementationVersion() {
+        try {
+            URLClassLoader cl = (URLClassLoader) Main.class.getClassLoader();
+            URL url = cl.findResource("META-INF/MANIFEST.MF");
+            Manifest manifest = new Manifest(url.openStream());
+            Attributes mainAttribs = manifest.getMainAttributes();
+            String version = mainAttribs.getValue("Implementation-Version");
+            if (version != null) {
+                return version;
+            }
+        } catch (Exception e) {
+            logger.trace("Unable to read a manifest version of this program.", e);
+        }
+        return "X.X.X.X";
+    }
 
-	@SuppressWarnings("static-access")
-	private Option generateOption(String opt, String longOpt, boolean hasArg, String description) {
-		return OptionBuilder.withLongOpt(longOpt).withDescription(description).hasArg(hasArg).isRequired(false)
-				.withArgName(longOpt).create(opt);
-	}
+    private void showHelp(Options options) {
+        // automatically generate the help statement
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("java -jar plugin-cleaner-" + getImplementationVersion() + "-jar-with-dependencies.jar ",
+                "", options, " For more information visit http://blog.chocolatejar.eu/eclipse-plugin-cleaner", true);
+    }
 
-	/**
-	 * Returns a command line option or a default value if the value is empty or
-	 * <code>null</code>.
-	 * 
-	 * @param option
-	 *            command line option, for example --source
-	 * @param defautlValue
-	 * @return never <code>null</code>, unless default value is
-	 *         <code>null</code>
-	 */
-	String getParam(String option, String defautlValue) {
-		String returnValue = null;
-		if (input.hasOption(option)) {
-			returnValue = StringUtils.trimToNull(input.getOptionValue(option));
-		}
-		if (returnValue != null) {
-			return returnValue;
-		}
-		return defautlValue;
+    @SuppressWarnings("static-access")
+    private Option generateOption(String opt, String longOpt, boolean hasArg, String description) {
+        return OptionBuilder.withLongOpt(longOpt).withDescription(description).hasArg(hasArg).isRequired(false)
+                .withArgName(longOpt).create(opt);
+    }
 
-	}
+    /**
+     * Returns a command line option or a default value if the value is empty or
+     * <code>null</code>.
+     * 
+     * @param option
+     *            command line option, for example --source
+     * @param defautlValue
+     * @return never <code>null</code>, unless default value is
+     *         <code>null</code>
+     */
+    String getParam(String option, String defautlValue) {
+        String returnValue = null;
+        if (input.hasOption(option)) {
+            returnValue = StringUtils.trimToNull(input.getOptionValue(option));
+        }
+        if (returnValue != null) {
+            return returnValue;
+        }
+        return defautlValue;
+
+    }
 }

@@ -13,31 +13,27 @@
  *See the License for the specific language governing permissions and
  *limitations under the License.
  *******************************************************************************/
-package eu.chocolatejar.eclipse.plugin.cleaner.model;
+package eu.chocolatejar.eclipse.plugin.cleaner.util;
 
-import eu.chocolatejar.eclipse.plugin.cleaner.detector.DropinsOnlyDuplicationDetector;
-import eu.chocolatejar.eclipse.plugin.cleaner.detector.PrefereDropinsDuplicationDetector;
-import eu.chocolatejar.eclipse.plugin.cleaner.detector.UnlimitedDuplicationDetector;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.regex.Pattern;
 
 /**
- * Represents a mode for artifact duplication detection.
- * 
- * @see DuplicationDetector
+ * Filters only file(s) within the dropins folder.
  */
-public enum CleaningMode {
+public class DropinsFilter implements FileFilter {
 
-    /**
-     * @see UnlimitedDuplicationDetector
-     */
-    unlimited,
+    private static final String SLASH = "\\" + File.separator;
 
-    /**
-     * @see DropinsOnlyDuplicationDetector
-     */
-    dropinsOnly,
+    private static final Pattern DROPINS_FOLDER_PATTERN = Pattern.compile("(" + SLASH + "?(dropins" + SLASH + "){1})+");
 
-    /**
-     * @see PrefereDropinsDuplicationDetector
-     */
-    prefereDropins
+    @Override
+    public boolean accept(File file) {
+        if (file == null) {
+            return false;
+        }
+        return DROPINS_FOLDER_PATTERN.matcher(file.getAbsolutePath()).find();
+    }
+
 }

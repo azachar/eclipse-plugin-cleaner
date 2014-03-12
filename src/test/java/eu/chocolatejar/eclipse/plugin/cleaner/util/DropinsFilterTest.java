@@ -1,0 +1,81 @@
+/*******************************************************************************
+ * Copyright 2014 Chocolate Jar, Andrej Zachar
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *Unless required by applicable law or agreed to in writing, software
+ *distributed under the License is distributed on an "AS IS" BASIS,
+ *WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *See the License for the specific language governing permissions and
+ *limitations under the License.
+ *******************************************************************************/
+package eu.chocolatejar.eclipse.plugin.cleaner.util;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * Checks if bundle path is within the dropins folder.
+ */
+public class DropinsFilterTest {
+
+    DropinsFilter filter;
+
+    @Before
+    public void before() {
+        filter = new DropinsFilter();
+    }
+
+    @Test
+    public void currentFolder() throws Exception {
+        assertThat(filter.accept(new File(""))).isFalse();
+    }
+
+    @Test
+    public void nullValue() throws Exception {
+        assertThat(filter.accept(null)).isFalse();
+    }
+
+    @Test
+    public void mustBeFolder_relative() throws Exception {
+        assertThat(filter.accept(new File("dropins"))).isFalse();
+    }
+
+    @Test
+    public void fileInDropinsFolder() throws Exception {
+        assertThat(filter.accept(FileUtils.getFile("dropins", "plugins", "a.jar"))).isTrue();
+    }
+
+    @Test
+    public void file() throws Exception {
+        assertThat(filter.accept(FileUtils.getFile("dropins", "a.jar"))).isTrue();
+    }
+
+    @Test
+    public void multipletimes() throws Exception {
+        assertThat(filter.accept(FileUtils.getFile("eclipse", "dropins", "eclipse", "dropins", "plugins", "a.jar")))
+                .isTrue();
+    }
+
+    @Test
+    public void bundleWithDropinsInTheName() throws Exception {
+        assertThat(filter.accept(FileUtils.getFile("eclipse", "plugins", "bundle_with_dropins_in_the_name_1.0.jar")))
+                .isFalse();
+    }
+
+    @Test
+    public void bundleWithDropinsInTheName_InDropinsFolder() throws Exception {
+        assertThat(filter.accept(FileUtils.getFile("eclipse", "dropins", "bundle_with_dropins_in_the_name_1.0.jar")))
+                .isTrue();
+    }
+
+}

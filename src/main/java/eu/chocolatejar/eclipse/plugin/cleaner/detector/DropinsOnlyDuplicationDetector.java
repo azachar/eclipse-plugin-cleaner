@@ -23,11 +23,11 @@ import eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact;
  */
 public class DropinsOnlyDuplicationDetector extends PrefereDropinsDuplicationDetector {
 
-	@Override
-	protected void keepAsDuplicate(Artifact artifact) {
-		// Only in the dropins folder can be the artifact marked as duplicated
-		if (artifact.isInDropinsFolder()) {
-			super.keepAsDuplicate(artifact);
-		}
-	}
+    @Override
+    protected void keepAsDuplicate(Artifact artifact) {
+        // Only in the dropins folder can be the artifact marked as duplicated
+        if (artifact.isInDropinsFolder()) {
+            super.keepAsDuplicate(artifact);
+        }
+    }
 }

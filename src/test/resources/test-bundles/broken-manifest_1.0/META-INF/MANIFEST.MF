@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Bundle-SymbolicName: ;singleton:=true
+Bundle-Version: dfdsfds
+

@@ -22,16 +22,16 @@ import eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact;
  */
 public class UnlimitedDuplicationDetector extends AbstractDuplicationDetector {
 
-	/**
-	 * Since the artifact and the master have the same version but are located
-	 * in a different folder we can choose one of them as to be marked as a
-	 * duplicate.
-	 * 
-	 * This implementation keeps the current master as a master and the artifact
-	 * as a duplicate.
-	 */
-	@Override
-	protected void detectDuplicateForSameVersions(Artifact artifact, Artifact master) {
-		keepAsDuplicate(artifact);
-	}
+    /**
+     * Since the artifact and the master have the same version but are located
+     * in a different folder we can choose one of them as to be marked as a
+     * duplicate.
+     * 
+     * This implementation keeps the current master as a master and the artifact
+     * as a duplicate.
+     */
+    @Override
+    protected void detectDuplicateForSameVersions(Artifact artifact, Artifact master) {
+        keepAsDuplicate(artifact);
+    }
 }
