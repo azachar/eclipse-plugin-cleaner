@@ -79,7 +79,7 @@ public class Artifact implements Comparable<Artifact> {
      *         <strong>dropins</strong> folder
      */
     public boolean isInDropinsFolder() {
-        return DROPINS_FILTER.accept(getSource());
+        return DROPINS_FILTER.accept(getLocation());
     }
 
     /**
@@ -87,7 +87,7 @@ public class Artifact implements Comparable<Artifact> {
      * 
      * @return a jar file or a folder
      */
-    public File getSource() {
+    public File getLocation() {
         return location;
     }
 

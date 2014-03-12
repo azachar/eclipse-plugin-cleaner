@@ -15,6 +15,8 @@
  *******************************************************************************/
 package eu.chocolatejar.eclipse.plugin.cleaner;
 
+import static eu.chocolatejar.eclipse.plugin.cleaner.util.DropinsFilter.DROPINS;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,30 +33,34 @@ import eu.chocolatejar.eclipse.plugin.cleaner.model.CleaningMode;
  * Finds duplicate bundles and move them to a back up folder
  */
 public class Cleaner {
+
     private static final Logger logger = LoggerFactory.getLogger(Cleaner.class);
+
+    private static final String FEATURES = "features";
+    private static final String PLUGINS = "plugins";
 
     private static final File THIS_EXECUTABLE_JAR = new File(Main.class.getProtectionDomain().getCodeSource()
             .getLocation().getPath());
 
     private final ArtifactParser artifactParser = new ArtifactParser();
+    private final DuplicationDetectorFactory detector;
 
-    private final File destinationFolder;
-    private final File sourceFolder;
-    private final boolean doRealCleanUp;
-
-    private CleaningMode cleaningMode;
+    private final File backupFolder;
+    private final File eclipseFolder;
+    private final boolean dryRun;
+    private final CleaningMode cleaningMode;
 
     /**
      * Create an instance of the Cleaner class and set initial cleaning
      * parameters.
      * 
-     * @param sourceFolder
+     * @param eclipseFolder
      *            The base directory to scan for an Eclipse Installation.
-     * @param destinationFolder
-     *            The destination folder for moving duplicates to
+     * @param backupFolder
+     *            The destination folder for duplicates back up
      * @param dryRun
      *            when <code>false</code> than duplicates are moved to the
-     *            {@link #destinationFolder}
+     *            {@link #backupFolder}
      * 
      *            when <code>true</code> than duplicates are just displayed, no
      *            action is taken!
@@ -64,17 +70,121 @@ public class Cleaner {
      *            duplicated artifacts.
      */
     public Cleaner(File sourceFolder, File destinationFolder, boolean dryRun, CleaningMode mode) {
-        this.sourceFolder = sourceFolder;
-        this.destinationFolder = destinationFolder;
+        this.eclipseFolder = sourceFolder;
+        this.backupFolder = destinationFolder;
         this.cleaningMode = mode;
-        this.doRealCleanUp = !dryRun;
+        this.dryRun = dryRun;
+        this.detector = new DuplicationDetectorFactory(cleaningMode);
     }
 
-    private Set<Artifact> find(String type) {
+    /**
+     * Executes clean up based on provided parameters in the constructor.
+     */
+    public void run() {
+        logger.info(
+                "\n Parameters summary\n\n Eclipse folder (source): '{}'\n Back up duplicates to: '{}'\n Dry run: '{}'\n Cleaning mode: '{}'\n\n",
+                eclipseFolder, backupFolder, dryRun, cleaningMode);
+
+        if (!eclipseFolder.exists()) {
+            logger.error(
+                    "The Eclipse installation hasn't been found at '{}', the location doesn't exists. \n\n The program terminated with an error!",
+                    eclipseFolder);
+            return;
+        }
+
+        if (backupFolder.exists()) {
+            logger.warn("The destination folder '{}' already exists! The duplicates will be move to this folder.",
+                    backupFolder);
+        }
+
+        logger.info("Scanning '{}'...", eclipseFolder);
+
+        simulateOrDoRealCleanUp();
+
+        logger.info("Done!");
+    }
+
+    /**
+     * Simulates or executes real clean up of plugins and features.
+     */
+    private void simulateOrDoRealCleanUp() {
+        Set<Artifact> plugins = findArtifacts(PLUGINS);
+        Set<Artifact> features = findArtifacts(FEATURES);
+
+        Set<Artifact> pluginsDuplicates = detector.getDuplicates(plugins);
+        Set<Artifact> featuresDuplicates = detector.getDuplicates(features);
+
+        if (dryRun) {
+            logger.info("\n Simulating clean up...");
+
+            showDuplicates(pluginsDuplicates);
+            showDuplicates(featuresDuplicates);
+        } else {
+            logger.info("\n Cleaning up...");
+
+            removeAndBackupDuplicates(pluginsDuplicates, PLUGINS);
+            removeAndBackupDuplicates(featuresDuplicates, FEATURES);
+
+            logger.warn("\n Duplicates are located at '{}'", backupFolder);
+        }
+
+        logger.warn("\n Found {} duplicates from overall {} plugins and {} duplicates from overall {} features.",
+                pluginsDuplicates.size(), plugins.size(), featuresDuplicates.size(), features.size());
+    }
+
+    private void showDuplicates(Set<Artifact> duplicates) {
+        for (Artifact a : duplicates) {
+            logger.info("{}", a);
+        }
+    }
+
+    /**
+     * Removes and back duplicates up.
+     * 
+     * @param duplicates
+     *            list of artifacts to remove
+     * @param type
+     *            either {@link #PLUGINS} or {@link #FEATURES}
+     */
+    private void removeAndBackupDuplicates(final Set<Artifact> duplicates, final String type) {
+        File destinationTypeFolder = FileUtils.getFile(backupFolder, type);
+
+        for (Artifact artifact : duplicates) {
+            logger.info("Cleaning {}", artifact);
+            try {
+                FileUtils.moveToDirectory(artifact.getLocation(), destinationTypeFolder, true);
+                logger.info(" OK");
+            } catch (FileExistsException e1) {
+                // the bundle was already copied there from an other
+                // location, so it means we have more duplicates in multiple
+                // location(s) with the same version, simply just delete it!
+                boolean wasDeleted = FileUtils.deleteQuietly(artifact.getLocation());
+                if (wasDeleted) {
+                    logger.warn(
+                            " --> The duplicate `{}` was deleted directly without creating a copy in the destination folder due to \n   `{}`.",
+                            artifact, e1.getLocalizedMessage());
+                } else {
+                    logger.warn(" Unable to remove the duplicate '{}' from '{}'.", artifact, artifact.getLocation());
+                }
+            } catch (Exception e) {
+                logger.error("Unable to remove the duplicate '{}'.", artifact, e);
+            }
+
+        }
+    }
+
+    /**
+     * Finds either plugins or features within Eclipse.
+     * 
+     * @param type
+     *            either {@link #PLUGINS} or {@link #FEATURES}
+     * @return never <code>null</code>
+     */
+    private Set<Artifact> findArtifacts(String type) {
         Set<Artifact> found = new HashSet<>();
-        find(FileUtils.getFile(sourceFolder, type), found);
-        find(FileUtils.getFile(sourceFolder, "dropins/eclipse/" + type), found);
-        find(FileUtils.getFile(sourceFolder, "dropins/" + type), found);
+        find(FileUtils.getFile(eclipseFolder, type), found);
+        find(FileUtils.getFile(eclipseFolder, DROPINS, "eclipse", type), found);
+        find(FileUtils.getFile(eclipseFolder, DROPINS, type), found);
         return found;
     }
 
@@ -95,89 +205,6 @@ public class Cleaner {
             if (a != null) {
                 artifacts.add(a);
             }
-        }
-    }
-
-    /**
-     * Executes clean up based on provided parameters in the constructor.
-     */
-    public void doCleanUp() {
-        logger.info(
-                "\n Parameters summary\n\n Eclipse source folder: '{}'\n Move duplicates to: '{}'\n Dry run: '{}'\n Cleaning mode: '{}'\n\n",
-                sourceFolder, destinationFolder, doRealCleanUp ? "No" : "Yes", cleaningMode);
-
-        if (!sourceFolder.exists()) {
-            logger.error(
-                    "The Eclipse installation hasn't been found at '{}', the location doesn't exists. \n\n The program terminated with an error!",
-                    sourceFolder);
-            return;
-        }
-
-        if (destinationFolder.exists()) {
-            logger.warn("The destination folder '{}' already exists! The duplicates will be move to this folder.",
-                    destinationFolder);
-        }
-
-        doCleanUpFor("plugins");
-        doCleanUpFor("features");
-
-        if (doRealCleanUp) {
-            logger.info("\nRemoved duplicates are located at '{}' !", destinationFolder);
-        }
-        logger.info("Done!");
-    }
-
-    private void doCleanUpFor(String type) {
-        File destinationTypeFolder = FileUtils.getFile(destinationFolder, type);
-
-        logger.info("Scanning your Eclipse installation for {} at '{}'\n", type, destinationTypeFolder);
-        Set<Artifact> artifacts = find(type);
-        if (artifacts.isEmpty()) {
-            logger.error("No {} found!", type);
-            return;
-        }
-
-        DuplicationDetectorFactory detector = new DuplicationDetectorFactory(cleaningMode);
-        final Set<Artifact> duplicates = detector.getDuplicates(artifacts);
-
-        logger.info("\n\nFound {} duplicates from {} {} \n", duplicates.size(), artifacts.size(), type);
-
-        if (doRealCleanUp) {
-            logger.info("\nCleaning...");
-            logger.info(" The duplicates will be moved to the folder '{}'\n", destinationTypeFolder);
-        }
-
-        for (Artifact artifact : duplicates) {
-            if (doRealCleanUp) {
-                logger.info("Cleaning up: {}", artifact);
-                try {
-                    FileUtils.moveToDirectory(artifact.getSource(), destinationTypeFolder, true);
-                    logger.info(" OK");
-                } catch (FileExistsException e1) {
-                    // the bundle was already copied there from an other
-                    // location, so it means we have more duplicates in multiple
-                    // location(s) with the same version, simply just delete it!
-                    boolean wasDeleted = FileUtils.deleteQuietly(artifact.getSource());
-                    if (wasDeleted) {
-                        logger.warn(
-                                " --> The duplicate `{}` was deleted direclty without creating a copy in the destination folder due to \n   `{}`.",
-                                artifact, e1.getLocalizedMessage());
-                    } else {
-                        logger.warn(" Unable to remove the duplicate '{}' from '{}'.", artifact, artifact.getSource());
-                    }
-                } catch (Exception e) {
-                    logger.warn("Unable to remove the duplicate '{}'.", artifact, e);
-                }
-            } else {
-                logger.info("(DRY-RUN) Duplicate: {}", artifact);
-            }
-
-        }
-
-        if (doRealCleanUp) {
-            logger.info("\nRemoved duplicates ({}) are located at '{}' !", type, destinationTypeFolder);
-        } else {
-            logger.info("\n(DRY-RUN) Removed duplicates ({}) will be located at '{}' !", type, destinationTypeFolder);
         }
     }
 }

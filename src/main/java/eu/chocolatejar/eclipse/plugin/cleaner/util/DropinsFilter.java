@@ -24,9 +24,15 @@ import java.util.regex.Pattern;
  */
 public class DropinsFilter implements FileFilter {
 
+    /**
+     * Name for the Eclipse dropins folder
+     */
+    public static final String DROPINS = "dropins";
+
     private static final String SLASH = "\\" + File.separator;
 
-    private static final Pattern DROPINS_FOLDER_PATTERN = Pattern.compile("(" + SLASH + "?(dropins" + SLASH + "){1})+");
+    private static final Pattern DROPINS_FOLDER_PATTERN = Pattern.compile("(" + SLASH + "?(" + DROPINS + SLASH
+            + "){1})+");
 
     @Override
     public boolean accept(File file) {

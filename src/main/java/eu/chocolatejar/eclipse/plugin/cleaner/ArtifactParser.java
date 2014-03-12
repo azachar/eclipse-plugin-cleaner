@@ -38,7 +38,7 @@ import eu.chocolatejar.eclipse.plugin.cleaner.model.Artifact;
  */
 public class ArtifactParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(Artifact.class);
+    private static final Logger logger = LoggerFactory.getLogger(ArtifactParser.class);
 
     /*
      * The regexp based on specification (

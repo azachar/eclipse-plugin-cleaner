@@ -98,7 +98,7 @@ public class Main {
             final CleaningMode cleaningMode = getParamMode(CleaningMode.dropinsOnly);
 
             Cleaner bundlesDuplicateCleaner = new Cleaner(sourceFolder, destinationFolder, dryRun, cleaningMode);
-            bundlesDuplicateCleaner.doCleanUp();
+            bundlesDuplicateCleaner.run();
 
         } catch (ParseException exp) {
             logger.error(exp.getMessage());

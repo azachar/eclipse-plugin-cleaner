@@ -43,7 +43,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
 
         assertThat(a).isNotNull();
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("missing-manifest");
         assertThat(a.getVersion().toString()).isEqualTo("1.2.3.GETTHIS");
     }
@@ -54,7 +54,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
 
         assertThat(a).isNotNull();
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("broken-manifest");
         assertThat(a.getVersion().toString()).isEqualTo("1.0.0");
     }
@@ -65,7 +65,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
         
         assertThat(a).isNotNull();
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("broken-manifest");
         assertThat(a.getVersion().toString()).isEqualTo("2.0.0");
     }
@@ -92,7 +92,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
 
         assertThat(a).isNotNull();
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("empty-manifest");
         assertThat(a.getVersion().toString()).isEqualTo("2.0.0");
     }
@@ -106,7 +106,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
         assertThat(a).isNotNull();
 
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("org.eclipse.wst.server_core.feature");
         assertThat(a.getVersion().toString()).isEqualTo("3.3.201.v20130412_1040-34Et8s73573C4Da2815");
     }
@@ -119,7 +119,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
         assertThat(a).isNotNull();
 
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("uppercase");
         assertThat(a.getVersion().toString()).isEqualTo("1.0.0");
     }
@@ -132,7 +132,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
         assertThat(a).isNotNull();
 
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("org.chromium.sdk.wipbackend.protocol_1_0");
         assertThat(a.getVersion().toString()).isEqualTo("0.3.8.201210040401");
     }
@@ -145,7 +145,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
         assertThat(a).isNotNull();
 
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getSymbolicName()).isEqualTo("biz.aQute.repository");
         assertThat(a.getVersion().toString()).isEqualTo("2.1.0.174214_220REL");
     }
@@ -158,7 +158,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
         assertThat(a).isNotNull();
 
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getVersion().toString()).isEqualTo("1.2.0.201402202217");
         assertThat(a.getSymbolicName()).isEqualTo("net.jeeeyul.pdetools.capability");
     }
@@ -171,7 +171,7 @@ public class ArtifactParserTest {
         Artifact a = new ArtifactParser().createFromFile(file);
         assertThat(a).isNotNull();
 
-        assertThat(a.getSource()).isEqualTo(file);
+        assertThat(a.getLocation()).isEqualTo(file);
         assertThat(a.getVersion().toString()).isEqualTo("1.1.300.v201004141630");
         assertThat(a.getSymbolicName()).isEqualTo("org.eclipse.jst.common.annotations.core");
     }
